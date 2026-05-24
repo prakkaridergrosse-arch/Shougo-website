@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>守護 Shougo</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  :root{
+    --bg:#0a0a14;--bg2:#0f0f1e;--bg3:#13132a;
+    --card:#16163a;--border:#2a2a5a;
+    --text:#e8e8ff;--muted:#8888cc;
+    --purple:#7c6fe0;--purple2:#9b8ff0;
+    --gold:#c9a84c;--gold2:#e8c76a;
+    --accent:#5b4fcf;
+  }
+  [data-theme="light"]{
+    --bg:#f0eeff;--bg2:#e8e4ff;--bg3:#ddd8ff;
+    --card:#ffffff;--border:#c5beff;
+    --text:#1a1640;--muted:#6655aa;
+    --purple:#5b4fcf;--purple2:#7c6fe0;
+    --gold:#9a7230;--gold2:#b8922a;
+    --accent:#5b4fcf;
+  }
+  body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;transition:background .3s,color .3s}
+
+  nav{position:sticky;top:0;z-index:100;background:var(--bg);border-bottom:1px solid var(--border);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:60px}
+  .nav-logo{display:flex;align-items:center;gap:10px;font-size:20px;font-weight:600;color:var(--text)}
+  .nav-logo span{color:var(--gold);font-size:22px}
+  .nav-links{display:flex;align-items:center;gap:1.5rem}
+  .nav-links a{color:var(--muted);text-decoration:none;font-size:14px;transition:color .2s}
+  .nav-links a:hover{color:var(--text)}
+  .nav-right{display:flex;align-items:center;gap:1rem}
+  .lang-btn,.theme-btn{background:none;border:1px solid var(--border);color:var(--muted);padding:6px 12px;border-radius:8px;cursor:pointer;font-size:13px;transition:all .2s}
+  .lang-btn:hover,.theme-btn:hover{border-color:var(--purple);color:var(--text)}
+  .invite-btn-nav{background:var(--accent);color:#fff;border:none;padding:8px 16px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:500;transition:all .2s;text-decoration:none}
+  .invite-btn-nav:hover{background:var(--purple2);transform:translateY(-1px)}
+
+  .hero{min-height:90vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:4rem 2rem;position:relative;overflow:hidden}
+  .hero-bg{position:absolute;inset:0;opacity:.06;background-image:repeating-linear-gradient(0deg,transparent,transparent 40px,var(--purple) 40px,var(--purple) 41px),repeating-linear-gradient(90deg,transparent,transparent 40px,var(--purple) 40px,var(--purple) 41px)}
+  .torii{font-size:72px;margin-bottom:1.5rem;filter:drop-shadow(0 0 20px rgba(124,111,224,.4))}
+  .hero h1{font-size:clamp(48px,8vw,80px);font-weight:700;letter-spacing:-2px;line-height:1;margin-bottom:.5rem}
+  .hero h1 .kanji{color:var(--gold);display:block;font-size:clamp(20px,3vw,28px);letter-spacing:4px;font-weight:400;margin-bottom:.5rem}
+  .hero-sub{font-size:clamp(16px,2.5vw,20px);color:var(--muted);max-width:540px;line-height:1.6;margin:1.5rem 0 2.5rem}
+  .hero-btns{display:flex;gap:1rem;flex-wrap:wrap;justify-content:center}
+  .btn-primary{background:var(--accent);color:#fff;border:none;padding:14px 32px;border-radius:10px;font-size:16px;font-weight:500;cursor:pointer;text-decoration:none;display:inline-block;transition:all .2s}
+  .btn-primary:hover{background:var(--purple2);transform:translateY(-2px)}
+  .btn-outline{background:none;color:var(--text);border:1px solid var(--border);padding:14px 32px;border-radius:10px;font-size:16px;cursor:pointer;text-decoration:none;display:inline-block;transition:all .2s}
+  .btn-outline:hover{border-color:var(--purple);transform:translateY(-2px)}
+
+  .stats{display:flex;gap:3rem;justify-content:center;margin-top:4rem;flex-wrap:wrap}
+  .stat{text-align:center}
+  .stat-num{font-size:32px;font-weight:700;color:var(--purple2)}
+  .stat-label{font-size:13px;color:var(--muted);margin-top:4px}
+
+  section{padding:5rem 2rem;max-width:1100px;margin:0 auto}
+  .section-label{font-size:13px;letter-spacing:3px;color:var(--gold);text-transform:uppercase;margin-bottom:1rem}
+  .section-title{font-size:clamp(28px,4vw,42px);font-weight:700;margin-bottom:1rem;letter-spacing:-1px}
+  .section-sub{font-size:16px;color:var(--muted);max-width:500px;line-height:1.6}
+
+  .features-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.5rem;margin-top:3rem}
+  .feature-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:1.75rem;transition:all .3s;position:relative;overflow:hidden}
+  .feature-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--purple),var(--gold));opacity:0;transition:opacity .3s}
+  .feature-card:hover{border-color:var(--purple);transform:translateY(-4px)}
+  .feature-card:hover::before{opacity:1}
+  .feature-icon{font-size:28px;margin-bottom:1rem}
+  .feature-title{font-size:17px;font-weight:600;margin-bottom:.5rem}
+  .feature-desc{font-size:14px;color:var(--muted);line-height:1.6}
+
+  .commands-section{background:var(--bg2);padding:5rem 2rem}
+  .commands-inner{max-width:1100px;margin:0 auto}
+  .cmd-tabs{display:flex;gap:.5rem;flex-wrap:wrap;margin:2rem 0 1.5rem}
+  .cmd-tab{background:none;border:1px solid var(--border);color:var(--muted);padding:8px 16px;border-radius:8px;cursor:pointer;font-size:14px;transition:all .2s}
+  .cmd-tab.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .cmd-list{display:none;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1rem}
+  .cmd-list.active{display:grid}
+  .cmd-item{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1rem 1.25rem}
+  .cmd-name{font-family:monospace;font-size:14px;color:var(--purple2);font-weight:600;margin-bottom:.25rem}
+  .cmd-desc{font-size:13px;color:var(--muted)}
+
+  .setup-section{max-width:1100px;margin:0 auto;padding:5rem 2rem}
+  .steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1.5rem;margin-top:3rem}
+  .step{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:1.75rem;position:relative}
+  .step-num{width:36px;height:36px;border-radius:50%;background:var(--accent);color:#fff;font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center;margin-bottom:1rem}
+  .step-title{font-size:16px;font-weight:600;margin-bottom:.5rem}
+  .step-desc{font-size:13px;color:var(--muted);line-height:1.6}
+
+  .cta-section{background:var(--bg2);padding:6rem 2rem;text-align:center}
+  .cta-kanji{font-size:60px;color:var(--gold);opacity:.3;margin-bottom:1rem}
+  .cta-title{font-size:clamp(28px,5vw,48px);font-weight:700;margin-bottom:1rem}
+  .cta-sub{font-size:16px;color:var(--muted);margin-bottom:2.5rem}
+
+  footer{background:var(--bg);border-top:1px solid var(--border);padding:2rem;text-align:center;color:var(--muted);font-size:13px}
+  footer span{color:var(--gold)}
+
+  .lang-en,.lang-de{transition:opacity .2s}
+  [data-lang="de"] .lang-en{display:none}
+  [data-lang="en"] .lang-de{display:none}
+</style>
+</head>
+<body data-theme="dark" data-lang="en">
+
+<nav>
+  <div class="nav-logo">
+    <span>守護</span> Shougo
+  </div>
+  <div class="nav-links">
+    <a href="#features"><span class="lang-en">Features</span><span class="lang-de">Features</span></a>
+    <a href="#commands"><span class="lang-en">Commands</span><span class="lang-de">Commands</span></a>
+    <a href="#setup"><span class="lang-en">Setup</span><span class="lang-de">Setup</span></a>
+  </div>
+  <div class="nav-right">
+    <button class="lang-btn" onclick="toggleLang()">🌐 <span id="lang-label">DE</span></button>
+    <button class="theme-btn" onclick="toggleTheme()" id="theme-btn">☀️</button>
+    <a href="https://discord.com/oauth2/authorize?client_id=1508010547436720312&permissions=4504974285597910&integration_type=0&scope=bot+applications.commands" class="invite-btn-nav">
+      <span class="lang-en">Invite Bot</span>
+      <span class="lang-de">Bot einladen</span>
+    </a>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="hero-bg"></div>
+  <div class="torii">⛩️</div>
+  <h1>
+    <span class="kanji">守護</span>
+    Shougo
+  </h1>
+  <p class="hero-sub">
+    <span class="lang-en">The free all-in-one Discord bot. Twitch & YouTube announcements, moderation, levels, events and more — no subscriptions, no limits.</span>
+    <span class="lang-de">Der kostenlose All-in-one Discord Bot. Twitch & YouTube Ankündigungen, Moderation, Level-System, Events und mehr — kein Abo, keine Limits.</span>
+  </p>
+  <div class="hero-btns">
+    <a href="https://discord.com/oauth2/authorize?client_id=1508010547436720312&permissions=4504974285597910&integration_type=0&scope=bot+applications.commands" class="btn-primary">
+      <span class="lang-en">➕ Add to Discord</span>
+      <span class="lang-de">➕ Zu Discord hinzufügen</span>
+    </a>
+    <a href="#features" class="btn-outline">
+      <span class="lang-en">Learn more</span>
+      <span class="lang-de">Mehr erfahren</span>
+    </a>
+  </div>
+  <div class="stats">
+    <div class="stat"><div class="stat-num">20+</div><div class="stat-label"><span class="lang-en">Commands</span><span class="lang-de">Commands</span></div></div>
+    <div class="stat"><div class="stat-num">100%</div><div class="stat-label"><span class="lang-en">Free</span><span class="lang-de">Kostenlos</span></div></div>
+    <div class="stat"><div class="stat-num">∞</div><div class="stat-label"><span class="lang-en">Servers</span><span class="lang-de">Server</span></div></div>
+    <div class="stat"><div class="stat-num">2</div><div class="stat-label"><span class="lang-en">Languages</span><span class="lang-de">Sprachen</span></div></div>
+  </div>
+</div>
+
+<section id="features">
+  <div class="section-label">Features</div>
+  <div class="section-title"><span class="lang-en">Everything your server needs</span><span class="lang-de">Alles was dein Server braucht</span></div>
+  <div class="section-sub"><span class="lang-en">Replace Carl-bot, MEE6 and others with a single bot — fully free, no limits.</span><span class="lang-de">Ersetze Carl-bot, MEE6 und andere mit einem einzigen Bot — komplett kostenlos, keine Limits.</span></div>
+  <div class="features-grid">
+    <div class="feature-card"><div class="feature-icon">🔴</div><div class="feature-title"><span class="lang-en">Twitch Announcements</span><span class="lang-de">Twitch Ankündigungen</span></div><div class="feature-desc"><span class="lang-en">Auto-announce when streamers go live. Custom messages, colors, mentions and per-streamer channels.</span><span class="lang-de">Automatische Ankündigung wenn Streamer live gehen. Custom Nachrichten, Farben, Erwähnungen und eigene Channels pro Streamer.</span></div></div>
+    <div class="feature-card"><div class="feature-icon">🎥</div><div class="feature-title">YouTube</div><div class="feature-desc"><span class="lang-en">Announce new videos and live streams from YouTube channels automatically.</span><span class="lang-de">Neue Videos und Live-Streams von YouTube-Kanälen automatisch ankündigen.</span></div></div>
+    <div class="feature-card"><div class="feature-icon">🛡️</div><div class="feature-title"><span class="lang-en">Moderation</span><span class="lang-de">Moderation</span></div><div class="feature-desc"><span class="lang-en">Warn, mute, kick, ban — with auto-mod for links, spam and banned words. All logged automatically.</span><span class="lang-de">Warn, Mute, Kick, Ban — mit Auto-Mod für Links, Spam und verbotene Wörter. Alles automatisch geloggt.</span></div></div>
+    <div class="feature-card"><div class="feature-icon">⭐</div><div class="feature-title"><span class="lang-en">Level system</span><span class="lang-de">Level-System</span></div><div class="feature-desc"><span class="lang-en">XP for every message, level-up announcements and a server leaderboard.</span><span class="lang-de">XP für jede Nachricht, Level-Aufstiege und eine Server-Rangliste.</span></div></div>
+    <div class="feature-card"><div class="feature-icon">📅</div><div class="feature-title">Events</div><div class="feature-desc"><span class="lang-en">Create events with automatic reminders 1 week, 1 day and 1 hour before.</span><span class="lang-de">Events erstellen mit automatischen Reminders 1 Woche, 1 Tag und 1 Stunde vorher.</span></div></div>
+    <div class="feature-card"><div class="feature-icon">👋</div><div class="feature-title"><span class="lang-en">Welcome & Goodbye</span><span class="lang-de">Willkommen & Abschied</span></div><div class="feature-desc"><span class="lang-en">Custom welcome and goodbye messages plus auto-role for new members.</span><span class="lang-de">Eigene Willkommens- und Abschiedsnachrichten plus Auto-Rolle für neue Mitglieder.</span></div></div>
+    <div class="feature-card"><div class="feature-icon">☀️</div><div class="feature-title"><span class="lang-en">Daily greeting</span><span class="lang-de">Tägliche Begrüßung</span></div><div class="feature-desc"><span class="lang-en">Post a random quote every day at your chosen time.</span><span class="lang-de">Täglich zur eingestellten Zeit einen zufälligen Spruch posten.</span></div></div>
+    <div class="feature-card"><div class="feature-icon">📋</div><div class="feature-title">Changelog</div><div class="feature-desc"><span class="lang-en">Post versioned changelogs directly from Discord. Automatic version numbering.</span><span class="lang-de">Versionierte Changelogs direkt aus Discord posten. Automatische Versionsnummern.</span></div></div>
+    <div class="feature-card"><div class="feature-icon">🌍</div><div class="feature-title"><span class="lang-en">Multilingual</span><span class="lang-de">Mehrsprachig</span></div><div class="feature-desc"><span class="lang-en">German and English built-in. Add more languages with a single JSON file — no code needed.</span><span class="lang-de">Deutsch und Englisch eingebaut. Weitere Sprachen per JSON-Datei — kein Code nötig.</span></div></div>
+  </div>
+</section>
+
+<div class="commands-section" id="commands">
+  <div class="commands-inner">
+    <div class="section-label">Commands</div>
+    <div class="section-title"><span class="lang-en">All slash commands</span><span class="lang-de">Alle Slash Commands</span></div>
+    <div class="cmd-tabs">
+      <button class="cmd-tab active" onclick="showTab('setup',this)">Setup</button>
+      <button class="cmd-tab" onclick="showTab('mod',this)"><span class="lang-en">Moderation</span><span class="lang-de">Moderation</span></button>
+      <button class="cmd-tab" onclick="showTab('levels',this)">Levels</button>
+      <button class="cmd-tab" onclick="showTab('twitch',this)">Twitch</button>
+      <button class="cmd-tab" onclick="showTab('youtube',this)">YouTube</button>
+      <button class="cmd-tab" onclick="showTab('events',this)">Events</button>
+      <button class="cmd-tab" onclick="showTab('misc',this)"><span class="lang-en">Other</span><span class="lang-de">Sonstiges</span></button>
+    </div>
+    <div id="tab-setup" class="cmd-list active">
+      <div class="cmd-item"><div class="cmd-name">/setup</div><div class="cmd-desc"><span class="lang-en">Create all channels automatically</span><span class="lang-de">Alle Channel automatisch erstellen</span></div></div>
+      <div class="cmd-item"><div class="cmd-name">/config language</div><div class="cmd-desc"><span class="lang-en">Set bot language (DE/EN)</span><span class="lang-de">Bot-Sprache setzen (DE/EN)</span></div></div>
+      <div class="cmd-item"><div class="cmd-name">/config channel</div><div class="cmd-desc"><span class="lang-en">Assign a channel to a feature</span><span class="lang-de">Channel einem Feature zuweisen</span></div></div>
+      <div class="cmd-item"><div class="cmd-name">/config welcome</div><div class="cmd-desc"><span class="lang-en">Configure welcome messages</span><span class="lang-de">Willkommensnachrichten konfigurieren</span></div></div>
+      <div class="cmd-item"><div class="cmd-name">/config autorole</div><div class="cmd-desc"><span class="lang-en">Auto-role for new members</span><span class="lang-de">Auto-Rolle für neue Mitglieder</span></div></div>
+      <div class="cmd-item"><div class="cmd-name">/config automod</div><div class="cmd-desc"><span class="lang-en">Configure auto-moderation</span><span class="lang-de">Auto-Moderation konfigurieren</span></div></div>
+      <div class="cmd-item"><div class="cmd-name">/config levels</div><div class="cmd-desc"><span class="lang-en">Configure XP system</span><span class="lang-de">XP-System konfigurieren</span></div></div>
+      <div class="cmd-item"><div class="cmd-name">/config greeting</div><div class="cmd-desc"><span class="lang-en">Daily greeting & time</span><span class="lang-de">Tägliche Begrüßung & Uhrzeit</span></div></div>
+    </div>
+    <div id="tab-mod" class="cmd-list">
+      <div class="cmd-item"><div class="cmd-name">/warn @user reason</div><div class="cmd-desc"><span class="lang-en">Warn a member</span><span class="lang-de">Mitglied verwarnen</span></div></div>
+      <div class="cmd-item"><div class="cmd-name">/warnings @user</div><div class="cmd-desc"><span class="lang-en">Show warnings for a member</span><span class="lang-de">Verwarnungen anzeigen</span></div></div>
+      <div class="cmd-item"><div class="cmd-name">/clearwarnings @user</div><div class="cmd-desc"><span class="lang-en">Clear all warnings</span><span class="lang-de">Alle Verwarnungen löschen</span></div></div>
+      <div class="cmd-item"><div class="cmd-name">/mute @user minutes</div><div class="cmd-desc"><span class="lang-en">Timeout a member</span><span class="lang-de">Mitglied stummschalten</span></div></div>
+      <div class="cmd-item"><div class="cmd-name">/kick @user reason</div><div class="cmd-desc"><span class="lang-en">Kick a member</span><span class="lang-de">Mitglied kicken</span></div></div>
+      <div class="cmd-item"><div class="cmd-name">/ban @user reason</div><div class="cmd-desc"><span class="lang-en">Ban a member</span><span class="lang-de">Mitglied bannen</span></div></div>
+    </div>
+    <div id="tab-levels" class="cmd-list">
+      <div class="cmd-item"><div class="cmd-name">/rank</div><div class="cmd-desc"><span class="lang-en">Show your rank</span><span class="lang-de">Eigenen Rang anzeigen</span></div></div>
+      <div class="cmd-item"><div class="cmd-name">/rank @user</div><div class="cmd-desc"><span class="lang-en">Show another member's rank</span><span class="lang-de">Rang eines anderen anzeigen</span></div></div>
+      <div class="cmd-item"><div class="cmd-name">/leaderboard</div><div class="cmd-desc"><span class="lang-en">Top 10 members by XP</span><span class="lang-de">Top 10 nach XP</span></div></div>
+    </div>
+    <div id="tab-twitch" class="cmd-list">
+      <div class="cmd-item"><div class="cmd-name">/addstreamer username</div><div class="cmd-desc"><span class="lang-en">Add a Twitch streamer</span><span class="lang-de">Twitch Streamer hinzufügen</span></div></div>
+      <div class="cmd-item"><div class="cmd-name">/removestreamer username</div><div class="cmd-desc"><span class="lang-en">Remove a Twitch streamer</span><span class="lang-de">Twitch Streamer entfernen</span></div></div>
+      <div class="cmd-item"><div class="cmd-name">/liststreamers</div><div class="cmd-desc"><span class="lang-en">List all monitored streamers</span><span class="lang-de">Alle Streamer anzeigen</span></div></div>
+      <div class="cmd-item"><div class="cmd-name">/streamersettings</div><div class="cmd-desc"><span class="lang-en">Customize announcement per streamer</span><span class="lang-de">Ankündigung pro Streamer anpassen</span></div></div>
+    </div>
+    <div id="tab-youtube" class="cmd-list">
+      <div class="cmd-item"><div class="cmd-name">/addyoutube @handle</div><div class="cmd-desc"><span class="lang-en">Add a YouTube channel</span><span class="lang-de">YouTube-Kanal hinzufügen</span></div></div>
+      <div class="cmd-item"><div class="cmd-name">/removeyoutube @handle</div><div class="cmd-desc"><span class="lang-en">Remove a YouTube channel</span><span class="lang-de">YouTube-Kanal entfernen</span></div></div>
+      <div class="cmd-item"><div class="cmd-name">/listyoutube</div><div class="cmd-desc"><span class="lang-en">List all monitored channels</span><span class="lang-de">Alle Kanäle anzeigen</span></div></div>
+    </div>
+    <div id="tab-events" class="cmd-list">
+      <div class="cmd-item"><div class="cmd-name">/event create</div><div class="cmd-desc"><span class="lang-en">Create an event with auto-reminders</span><span class="lang-de">Event mit Auto-Reminders erstellen</span></div></div>
+      <div class="cmd-item"><div class="cmd-name">/event list</div><div class="cmd-desc"><span class="lang-en">Show upcoming events</span><span class="lang-de">Kommende Events anzeigen</span></div></div>
+      <div class="cmd-item"><div class="cmd-name">/event delete</div><div class="cmd-desc"><span class="lang-en">Delete an event</span><span class="lang-de">Event löschen</span></div></div>
+    </div>
+    <div id="tab-misc" class="cmd-list">
+      <div class="cmd-item"><div class="cmd-name">/greeting add</div><div class="cmd-desc"><span class="lang-en">Add a daily greeting quote</span><span class="lang-de">Täglichen Spruch hinzufügen</span></div></div>
+      <div class="cmd-item"><div class="cmd-name">/greeting list</div><div class="cmd-desc"><span class="lang-en">List all quotes</span><span class="lang-de">Alle Sprüche anzeigen</span></div></div>
+      <div class="cmd-item"><div class="cmd-name">/greeting remove</div><div class="cmd-desc"><span class="lang-en">Remove a quote</span><span class="lang-de">Spruch entfernen</span></div></div>
+      <div class="cmd-item"><div class="cmd-name">/changelog post</div><div class="cmd-desc"><span class="lang-en">Post a versioned changelog</span><span class="lang-de">Versionierten Changelog posten</span></div></div>
+      <div class="cmd-item"><div class="cmd-name">/changelog history</div><div class="cmd-desc"><span class="lang-en">Show changelog history</span><span class="lang-de">Changelog-Historie anzeigen</span></div></div>
+    </div>
+  </div>
+</div>
+
+<div class="setup-section" id="setup">
+  <div class="section-label">Setup</div>
+  <div class="section-title"><span class="lang-en">Up and running in minutes</span><span class="lang-de">In wenigen Minuten startklar</span></div>
+  <div class="steps">
+    <div class="step"><div class="step-num">1</div><div class="step-title"><span class="lang-en">Invite Shougo</span><span class="lang-de">Shougo einladen</span></div><div class="step-desc"><span class="lang-en">Click the invite button and add Shougo to your Discord server.</span><span class="lang-de">Klicke auf Einladen und füge Shougo zu deinem Discord-Server hinzu.</span></div></div>
+    <div class="step"><div class="step-num">2</div><div class="step-title"><span class="lang-en">Run /setup</span><span class="lang-de">/setup ausführen</span></div><div class="step-desc"><span class="lang-en">Shougo automatically creates all needed channels in one command.</span><span class="lang-de">Shougo erstellt automatisch alle nötigen Channel mit einem einzigen Command.</span></div></div>
+    <div class="step"><div class="step-num">3</div><div class="step-title"><span class="lang-en">Set your language</span><span class="lang-de">Sprache einstellen</span></div><div class="step-desc"><span class="lang-en">Use /config language to set German or English for your server.</span><span class="lang-de">Mit /config language Deutsch oder Englisch für deinen Server einstellen.</span></div></div>
+    <div class="step"><div class="step-num">4</div><div class="step-title"><span class="lang-en">Configure features</span><span class="lang-de">Features konfigurieren</span></div><div class="step-desc"><span class="lang-en">Add streamers, enable moderation and set up everything with slash commands.</span><span class="lang-de">Streamer hinzufügen, Moderation aktivieren und alles per Slash Command einrichten.</span></div></div>
+  </div>
+</div>
+
+<div class="cta-section">
+  <div class="cta-kanji">守護</div>
+  <div class="cta-title"><span class="lang-en">Ready to guard your server?</span><span class="lang-de">Bereit deinen Server zu schützen?</span></div>
+  <div class="cta-sub"><span class="lang-en">Free forever. No subscriptions. No limits.</span><span class="lang-de">Für immer kostenlos. Kein Abo. Keine Limits.</span></div>
+  <a href="https://discord.com/oauth2/authorize?client_id=1508010547436720312&permissions=4504974285597910&integration_type=0&scope=bot+applications.commands" class="btn-primary">
+    <span class="lang-en">➕ Add Shougo to Discord</span>
+    <span class="lang-de">➕ Shougo zu Discord hinzufügen</span>
+  </a>
+</div>
+
+<footer>
+  <span>守護</span> Shougo — Free &amp; Open Source Discord Bot
+</footer>
+
+<script>
+function toggleTheme(){
+  var b=document.body;
+  var isDark=b.dataset.theme==='dark';
+  b.dataset.theme=isDark?'light':'dark';
+  document.getElementById('theme-btn').textContent=isDark?'🌙':'☀️';
+}
+function toggleLang(){
+  var b=document.body;
+  var isEn=b.dataset.lang==='en';
+  b.dataset.lang=isEn?'de':'en';
+  document.getElementById('lang-label').textContent=isEn?'EN':'DE';
+}
+function showTab(name,btn){
+  document.querySelectorAll('.cmd-list').forEach(function(el){el.classList.remove('active')});
+  document.querySelectorAll('.cmd-tab').forEach(function(el){el.classList.remove('active')});
+  document.getElementById('tab-'+name).classList.add('active');
+  btn.classList.add('active');
+}
+</script>
+</body>
+</html>
